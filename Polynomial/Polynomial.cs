@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Algebra
 {
@@ -40,13 +39,16 @@ namespace Algebra
         }
         public override string ToString()
         {
-            StringBuilder builder = new StringBuilder("y[x] = ");
+            StringBuilder builder = new StringBuilder("y = ");
 
             for (int i = 0; i < _coes.Count; i++)
             {
                 if (_coes[i].CompareTo(default(T)) == 0 ) continue;
 
-                builder.AppendFormat("{0}*x{1}{2}", _coes[i], i > 0 ? "^"+(i+1) : "", i < _coes.Count ? " + " : "");
+                builder.AppendFormat("{0}{1}{2}", 
+                    i > 0 ? _coes[i].ToString() + "x" : _coes[i].ToString(),
+                    i > 1 ? "^"+(i) : "",
+                    i < (_coes.Count - 1)? " + " : "");
             }
 
             return builder.ToString();
@@ -57,7 +59,8 @@ namespace Algebra
         }
 
         public int CompareTo(Polynomial<T> other)
-        {            if (other == null) return 1;
+        {
+            if (other == null) return 1;
 
             if (_coes.Count > other._coes.Count) return 1;
             else if (_coes.Count < other._coes.Count) return -1;
@@ -72,22 +75,62 @@ namespace Algebra
             return 0;
         }
 
-        public static Polynomial<T> operator+(Polynomial<T> lhs, Polynomial<T> rhs)
+        public static Polynomial<T> operator +(Polynomial<T> lhs, Polynomial<T> rhs)
         {
             throw new NotImplementedException();
         }
 
-        public static Polynomial<T> operator-(Polynomial<T> lhs, Polynomial<T> rhs)
+        public static Polynomial<T> operator -(Polynomial<T> lhs, Polynomial<T> rhs)
         {
             throw new NotImplementedException();
         }
 
-        public static Polynomial<T> operator*(Polynomial<T> lhs, Polynomial<T> rhs)
+        public static Polynomial<T> operator *(Polynomial<T> lhs, Polynomial<T> rhs)
         {
             throw new NotImplementedException();
         }
 
-        public static Polynomial<T> operator/(Polynomial<T> lhs, Polynomial<T> rhs)
+        public static Polynomial<T> operator /(Polynomial<T> lhs, Polynomial<T> rhs)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Polynomial<T> operator +(Polynomial<T> lhs, T rhs)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Polynomial<T> operator +(T lhs, Polynomial<T> rhs)
+        {
+            return rhs + lhs;
+        }
+
+        public static Polynomial<T> operator *(Polynomial<T> lhs, T rhs)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Polynomial<T> operator *(T lhs, Polynomial<T> rhs)
+        {
+            return rhs + lhs;
+        }
+
+        public static Polynomial<T> operator -(Polynomial<T> lhs, T rhs)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Polynomial<T> operator -(T lhs, Polynomial<T> rhs)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Polynomial<T> operator /(Polynomial<T> lhs, T rhs)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Polynomial<T> operator /(T lhs, Polynomial<T> rhs)
         {
             throw new NotImplementedException();
         }
