@@ -5,10 +5,12 @@ using System.Text;
 
 namespace Algebra
 {
-    public class Polynomial<T> : ICloneable, IComparable<Polynomial<T>>
+    public class Polynomial<T,C> : ICloneable, IComparable<Polynomial<T,C>>
         where T : struct, IComparable
+        where C : IMathOperations<T>, new()
     {
         private List<T> _coes;
+        private static readonly IMathOperations<T> _calculator = new C();
 
         public T this[int index]
         {
@@ -55,10 +57,10 @@ namespace Algebra
         }
         public object Clone()
         {
-            return new Polynomial<T>(_coes.ToList());
+            return new Polynomial<T,C>(_coes.ToList());
         }
 
-        public int CompareTo(Polynomial<T> other)
+        public int CompareTo(Polynomial<T,C> other)
         {
             if (other == null) return 1;
 
@@ -75,64 +77,93 @@ namespace Algebra
             return 0;
         }
 
-        public static Polynomial<T> operator +(Polynomial<T> lhs, Polynomial<T> rhs)
+        public T Calculate(T x)
         {
             throw new NotImplementedException();
         }
 
-        public static Polynomial<T> operator -(Polynomial<T> lhs, Polynomial<T> rhs)
+        public static Polynomial<T,C> operator +(Polynomial<T,C> lhs, Polynomial<T,C> rhs)
         {
             throw new NotImplementedException();
         }
 
-        public static Polynomial<T> operator *(Polynomial<T> lhs, Polynomial<T> rhs)
+        public static Polynomial<T,C> operator -(Polynomial<T,C> lhs, Polynomial<T,C> rhs)
         {
             throw new NotImplementedException();
         }
 
-        public static Polynomial<T> operator /(Polynomial<T> lhs, Polynomial<T> rhs)
+        public static Polynomial<T,C> operator *(Polynomial<T,C> lhs, Polynomial<T,C> rhs)
         {
             throw new NotImplementedException();
         }
 
-        public static Polynomial<T> operator +(Polynomial<T> lhs, T rhs)
+        public static Polynomial<T,C> operator /(Polynomial<T,C> lhs, Polynomial<T,C> rhs)
         {
             throw new NotImplementedException();
         }
 
-        public static Polynomial<T> operator +(T lhs, Polynomial<T> rhs)
+        public static Polynomial<T,C> operator +(Polynomial<T,C> lhs, T rhs)
+        {
+            Polynomial<T,C> polynomial = (lhs.Clone() as Polynomial<T,C>);
+
+            polynomial[0] = _calculator.Add(lhs[0], rhs);
+
+            return polynomial;
+        }
+
+        public static Polynomial<T,C> operator +(T lhs, Polynomial<T,C> rhs)
         {
             return rhs + lhs;
         }
 
-        public static Polynomial<T> operator *(Polynomial<T> lhs, T rhs)
+        public static Polynomial<T,C> operator *(Polynomial<T,C> lhs, T rhs)
         {
-            throw new NotImplementedException();
+            List<T> multipliedCoes = lhs._coes.Select(i => _calculator.Mul(i, rhs)).ToList();
+
+            return new Polynomial<T,C>(multipliedCoes);
         }
 
-        public static Polynomial<T> operator *(T lhs, Polynomial<T> rhs)
+        public static Polynomial<T,C> operator *(T lhs, Polynomial<T,C> rhs)
         {
-            return rhs + lhs;
+            return rhs * lhs;
         }
 
-        public static Polynomial<T> operator -(Polynomial<T> lhs, T rhs)
+        public static Polynomial<T,C> operator -(Polynomial<T,C> lhs, T rhs)
         {
-            throw new NotImplementedException();
+            Polynomial<T,C> polynomial = (lhs.Clone() as Polynomial<T,C>);
+
+            polynomial[0] = _calculator.Sub(lhs[0], rhs);
+
+            return polynomial;
         }
 
-        public static Polynomial<T> operator -(T lhs, Polynomial<T> rhs)
+        public static Polynomial<T,C> operator -(T lhs, Polynomial<T,C> rhs)
         {
-            throw new NotImplementedException();
+            Polynomial<T, C> polynomial = (rhs.Clone() as Polynomial<T, C>);
+
+            polynomial[0] = _calculator.Sub(lhs, rhs[0]);
+
+            return polynomial;
         }
 
-        public static Polynomial<T> operator /(Polynomial<T> lhs, T rhs)
+        public static Polynomial<T,C> operator /(Polynomial<T,C> lhs, T rhs)
         {
-            throw new NotImplementedException();
+            if (rhs.CompareTo(default(T)) == 0) throw new DivideByZeroException();
+
+            Polynomial<T,C> polynomial = ((lhs.Clone() as Polynomial<T,C>));
+            polynomial._coes = lhs._coes.Select(i => _calculator.Div(i, rhs)).ToList();
+
+            return polynomial;
         }
 
-        public static Polynomial<T> operator /(T lhs, Polynomial<T> rhs)
+        public static Polynomial<T,C> operator /(T lhs, Polynomial<T,C> rhs)
         {
-            throw new NotImplementedException();
+
+            Polynomial<T, C> polynomial = ((rhs.Clone() as Polynomial<T, C>));
+
+            polynomial._coes = rhs._coes.Select( i => (i.CompareTo(default(T)) == 0) ? i : _calculator.Div(lhs, i)).ToList();
+
+            return polynomial;
         }
     }
 }

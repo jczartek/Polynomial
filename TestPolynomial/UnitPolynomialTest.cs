@@ -1,5 +1,4 @@
-﻿using System;
-using Algebra;
+﻿using Algebra;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestPolynomial
@@ -10,7 +9,7 @@ namespace TestPolynomial
         [TestMethod]
         public void TestToString()
         {
-            Polynomial<double> polynomial = new Polynomial<double>(new double[3] { 1, 2, 3 });
+            Polynomial<double, DoubleMathOperations> polynomial = new Polynomial<double, DoubleMathOperations>(new double[3] { 1, 2, 3 });
 
             Assert.AreEqual("y = 1 + 2x + 3x^2", polynomial.ToString());
 
@@ -21,8 +20,8 @@ namespace TestPolynomial
         [TestMethod]
         public void TestCompareTo()
         {
-            var poly1 = new Polynomial<double>(new double[3] { 1, 2, 3 });
-            var poly2 = new Polynomial<double>(new double[3] { 1, 2, 3 });
+            var poly1 = new Polynomial<double, DoubleMathOperations>(new double[3] { 1, 2, 3 });
+            var poly2 = new Polynomial<double, DoubleMathOperations>(new double[3] { 1, 2, 3 });
 
             // Are the same
             Assert.AreEqual(0, poly1.CompareTo(poly2));
@@ -39,8 +38,8 @@ namespace TestPolynomial
         [TestMethod]
         public void TestClone()
         {
-            var poly1 = new Polynomial<double>(new double[3] { 1, 2, 3 });
-            var poly2 = (poly1.Clone() as Polynomial<double>);
+            var poly1 = new Polynomial<double, DoubleMathOperations>(new double[3] { 1, 2, 3 });
+            var poly2 = (poly1.Clone() as Polynomial<double, DoubleMathOperations>);
 
             Assert.AreEqual(0, poly1.CompareTo(poly2));
         }
@@ -48,7 +47,7 @@ namespace TestPolynomial
         [TestMethod]
         public void TestResize()
         {
-            var poly = new Polynomial<double>(new double[2] { 1, 2});
+            var poly = new Polynomial<double, DoubleMathOperations>(new double[2] { 1, 2});
             poly[2] = 3;
 
             Assert.AreEqual("y = 1 + 2x + 3x^2", poly.ToString());
