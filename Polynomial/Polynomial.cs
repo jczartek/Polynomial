@@ -79,7 +79,15 @@ namespace Algebra
 
         public T Calculate(T x)
         {
-            throw new NotImplementedException();
+            T result = default;
+
+            if (_coes.Count > 0)
+                result = _coes[0];
+
+            for (int i = 1; i < _coes.Count; i++)
+                result = _calculator.Add(result, _calculator.Mul(_coes[i], _calculator.Pow(x, (double)i)));
+
+            return result;
         }
 
         public static Polynomial<T,C> operator +(Polynomial<T,C> lhs, Polynomial<T,C> rhs)

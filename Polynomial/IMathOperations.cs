@@ -12,6 +12,6 @@ namespace Algebra
         T Sub(T a, T b);
         T Mul(T a, T b);
         T Div(T a, T b);
-        T Pow(T x, T y);
+        T Pow(T x, double y);
     }
 }

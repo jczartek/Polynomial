@@ -52,5 +52,20 @@ namespace TestPolynomial
 
             Assert.AreEqual("y = 1 + 2x + 3x^2", poly.ToString());
         }
+
+        [TestMethod]
+        public void TestCalculate()
+        {
+            var poly = new Polynomial<double, DoubleMathOperations>(new double[3] { 1, 2, 1 });
+
+            double result = poly.Calculate(10);
+
+            poly = new Polynomial<double, DoubleMathOperations>(new double[3] { 1, 2, 5 });
+
+            result = poly.Calculate(10);
+
+
+            Assert.AreEqual(521, result);
+        }
     }
 }
