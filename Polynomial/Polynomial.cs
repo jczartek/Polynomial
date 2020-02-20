@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Algebra
 {
-    public class Polynomial<T,C> : ICloneable, IComparable<Polynomial<T,C>>
+    public class Polynomial<T, C> : ICloneable, IComparable<Polynomial<T, C>>
         where T : struct, IComparable
         where C : IMathOperations<T>, new()
     {
@@ -15,7 +15,7 @@ namespace Algebra
         public T this[int index]
         {
             get { return _coes[index]; }
-            set 
+            set
             {
                 if (index >= _coes.Count)
                 {
@@ -23,7 +23,7 @@ namespace Algebra
                     _coes.CopyTo(tmp);
                     _coes = tmp.ToList();
                 }
-                
+
                 _coes[index] = value;
             }
         }
@@ -45,22 +45,22 @@ namespace Algebra
 
             for (int i = 0; i < _coes.Count; i++)
             {
-                if (_coes[i].CompareTo(default(T)) == 0 ) continue;
+                if (_coes[i].CompareTo(default(T)) == 0) continue;
 
-                builder.AppendFormat("{0}{1}{2}", 
+                builder.AppendFormat("{0}{1}{2}",
                     i > 0 ? _coes[i].ToString() + "x" : _coes[i].ToString(),
-                    i > 1 ? "^"+(i) : "",
-                    i < (_coes.Count - 1)? " + " : "");
+                    i > 1 ? "^" + (i) : "",
+                    i < (_coes.Count - 1) ? " + " : "");
             }
 
             return builder.ToString();
         }
         public object Clone()
         {
-            return new Polynomial<T,C>(_coes.ToList());
+            return new Polynomial<T, C>(_coes.ToList());
         }
 
-        public int CompareTo(Polynomial<T,C> other)
+        public int CompareTo(Polynomial<T, C> other)
         {
             if (other == null) return 1;
 
@@ -90,9 +90,29 @@ namespace Algebra
             return result;
         }
 
-        public static Polynomial<T,C> operator +(Polynomial<T,C> lhs, Polynomial<T,C> rhs)
+        public static Polynomial<T, C> operator +(Polynomial<T, C> lhs, Polynomial<T, C> rhs)
         {
-            throw new NotImplementedException();
+            var greaterPoly = lhs._coes.Count >= rhs._coes.Count ? lhs : rhs;
+            var lowerPoly = lhs._coes.Count < rhs._coes.Count ? lhs : rhs;
+
+            int maxCount = greaterPoly._coes.Count;
+            int minCount = lowerPoly._coes.Count;
+
+            List<T> nCoes = new List<T>(maxCount);
+            T item = default;
+            for (int i = 0; i < maxCount; i++)
+            {
+                if (i < minCount)
+                {
+                    item = _calculator.Add(greaterPoly[i], lowerPoly[i]);
+                    nCoes.Add(item);
+                    continue;
+                }
+                nCoes.Add(greaterPoly[i]);
+            }
+
+
+            return new Polynomial<T, C>(nCoes);
         }
 
         public static Polynomial<T,C> operator -(Polynomial<T,C> lhs, Polynomial<T,C> rhs)
