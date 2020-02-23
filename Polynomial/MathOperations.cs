@@ -11,7 +11,7 @@ namespace Algebra
 
         public double Mul(double a, double b) => a * b;
 
-        public double Sub(double a, double b) => a * b;
+        public double Sub(double a, double b) => a - b;
 
         public double Pow(double x, double y) => Math.Pow(x, y);
 

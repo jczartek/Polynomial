@@ -28,6 +28,11 @@ namespace Algebra
             }
         }
 
+        public int Degree
+        {
+            get { return _coes.Count - 1; }
+        }
+
         private Polynomial() { }
 
         public Polynomial(T[] ceos)
@@ -46,11 +51,13 @@ namespace Algebra
             for (int i = 0; i < _coes.Count; i++)
             {
                 if (_coes[i].CompareTo(default(T)) == 0) continue;
-
+                
+                var sign = (_coes[i].CompareTo(default(T))) == -1 ? " - " : " + ";
+                
                 builder.AppendFormat("{0}{1}{2}",
                     i > 0 ? _coes[i].ToString() + "x" : _coes[i].ToString(),
                     i > 1 ? "^" + (i) : "",
-                    i < (_coes.Count - 1) ? " + " : "");
+                    i < (_coes.Count - 1) ? sign : "");
             }
 
             return builder.ToString();
@@ -111,18 +118,45 @@ namespace Algebra
                 nCoes.Add(greaterPoly[i]);
             }
 
-
             return new Polynomial<T, C>(nCoes);
         }
 
         public static Polynomial<T,C> operator -(Polynomial<T,C> lhs, Polynomial<T,C> rhs)
         {
-            throw new NotImplementedException();
+            int maxCount = Math.Max(lhs._coes.Count, rhs._coes.Count);
+            int minCount = Math.Min(lhs._coes.Count, rhs._coes.Count);
+            var greaterPoly = lhs._coes.Count >= rhs._coes.Count ? lhs : rhs;
+            List<T> nCoes = new List<T>(maxCount);
+
+            for (int i = 0; i < maxCount; i++)
+            {
+                if ( i < minCount)
+                {
+                    var item = _calculator.Sub(lhs[i], rhs[i]);
+                    nCoes.Add(item);
+                    continue;
+                }
+                nCoes.Add(greaterPoly[i]);
+            }
+
+            return new Polynomial<T, C>(nCoes);
         }
 
         public static Polynomial<T,C> operator *(Polynomial<T,C> lhs, Polynomial<T,C> rhs)
         {
-            throw new NotImplementedException();
+            T[] coes = new T[lhs._coes.Count + rhs._coes.Count - 1];
+
+            for (int i = 0; i < coes.Length; i++)
+                coes[i] = default;
+
+            int lCount = lhs._coes.Count;
+            int rCount = rhs._coes.Count;
+
+            for (int i = 0; i < lCount; i++)
+                for (int j = 0; j < rCount; j++)
+                    coes[i + j] = _calculator.Add(coes[i+j], _calculator.Mul(lhs[i], rhs[j]));
+
+            return new Polynomial<T, C>(coes);
         }
 
         public static Polynomial<T,C> operator /(Polynomial<T,C> lhs, Polynomial<T,C> rhs)

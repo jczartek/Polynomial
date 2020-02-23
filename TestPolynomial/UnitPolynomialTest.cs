@@ -95,5 +95,43 @@ namespace TestPolynomial
             Assert.AreEqual(result.CompareTo(new Polynomial<double, DoubleMathOperations>(new double[4] { 22, -4, -1, 7 })), 0);
 
         }
+
+        [TestMethod]
+        public void TestMinusOperator()
+        {
+            // 4x^3 + 2x^2 + 10x + 17  -  2x^2 + 9x + 1
+            //  2x^2 + 9x + 1   -  4x^3 + 2x^2 + 10x + 17
+            var poly1 = new Polynomial<double, DoubleMathOperations>(new double[4] { 17, 10, 2, 4});
+            var poly2 = new Polynomial<double, DoubleMathOperations>(new double[3] { 1, 9, 2});
+
+            var result = poly1 - poly2;
+            Assert.AreEqual(result.CompareTo(new Polynomial<double, DoubleMathOperations>(new double[4] { 16, 1, 0, 4 })), 0);
+
+            result = poly2 - poly1;
+            Assert.AreEqual(result.CompareTo(new Polynomial<double, DoubleMathOperations>(new double[4] { -16, -1, 0, 4 })), 0);
+        }
+
+        [TestMethod]
+        public void TestDegree()
+        {
+            var poly = new Polynomial<double, DoubleMathOperations>(new double[7] { 0, -1, 3, 0, 0, 2, -6 });
+            Assert.AreEqual(6, poly.Degree);
+        }
+
+        [TestMethod]
+        public void TestMultiplyOperator()
+        {
+            var poly1 = new Polynomial<double, DoubleMathOperations>(new double[3] {0, -1, 3 });
+            var poly2 = new Polynomial<double, DoubleMathOperations>(new double[5] {1, 0, 0, 0, -2});
+
+            var result = poly1 * poly2;
+
+            var poly = new Polynomial<double, DoubleMathOperations>(new double[7] {0, -1, 3, 0, 0, 2, -6});
+
+            Assert.AreEqual(result.CompareTo(poly), 0);
+
+            result = poly2 * poly1;
+            Assert.AreEqual(result.CompareTo(poly), 0);
+        }
     }
 }
