@@ -10,7 +10,7 @@ namespace Algebra
         where C : IMathOperations<T>, new()
     {
         private List<T> _coes;
-        private static readonly IMathOperations<T> _calculator = new C();
+        private static readonly IMathOperations<T> OP = new C();
 
         public T this[int index]
         {
@@ -52,10 +52,11 @@ namespace Algebra
             {
                 if (_coes[i].CompareTo(default(T)) == 0) continue;
                 
-                var sign = (_coes[i].CompareTo(default(T))) == -1 ? " - " : " + ";
+                string sign = (_coes[i].CompareTo(default(T))) == -1 ? " - " : " + ";
+                T absNumber = OP.Abs(_coes[i]);
                 
                 builder.AppendFormat("{0}{1}{2}",
-                    i > 0 ? _coes[i].ToString() + "x" : _coes[i].ToString(),
+                    i > 0 ? absNumber.ToString() + "x" : _coes[i].ToString(),
                     i > 1 ? "^" + (i) : "",
                     i < (_coes.Count - 1) ? sign : "");
             }
@@ -92,7 +93,7 @@ namespace Algebra
                 result = _coes[0];
 
             for (int i = 1; i < _coes.Count; i++)
-                result = _calculator.Add(result, _calculator.Mul(_coes[i], _calculator.Pow(x, (double)i)));
+                result = OP.Add(result, OP.Mul(_coes[i], OP.Pow(x, (double)i)));
 
             return result;
         }
@@ -111,13 +112,12 @@ namespace Algebra
             {
                 if (i < minCount)
                 {
-                    item = _calculator.Add(greaterPoly[i], lowerPoly[i]);
+                    item = OP.Add(greaterPoly[i], lowerPoly[i]);
                     nCoes.Add(item);
                     continue;
                 }
                 nCoes.Add(greaterPoly[i]);
             }
-
             return new Polynomial<T, C>(nCoes);
         }
 
@@ -132,7 +132,7 @@ namespace Algebra
             {
                 if ( i < minCount)
                 {
-                    var item = _calculator.Sub(lhs[i], rhs[i]);
+                    var item = OP.Sub(lhs[i], rhs[i]);
                     nCoes.Add(item);
                     continue;
                 }
@@ -154,21 +154,56 @@ namespace Algebra
 
             for (int i = 0; i < lCount; i++)
                 for (int j = 0; j < rCount; j++)
-                    coes[i + j] = _calculator.Add(coes[i+j], _calculator.Mul(lhs[i], rhs[j]));
+                    coes[i + j] = OP.Add(coes[i+j], OP.Mul(lhs[i], rhs[j]));
 
             return new Polynomial<T, C>(coes);
         }
 
-        public static Polynomial<T,C> operator /(Polynomial<T,C> lhs, Polynomial<T,C> rhs)
+        private static (List<T>, List<T>) SyntheticDivision(List<T> dividend, List<T> divisor)
         {
-            throw new NotImplementedException();
+            List<T> output = dividend.ToList();
+
+            output.Reverse();
+            divisor = divisor.ToList();
+            divisor.Reverse();
+
+            T normalizer = divisor[0];
+
+            for (int i = 0; i < dividend.Count() - (divisor.Count() - 1); i++)
+            {
+                output[i] = OP.Div(output[i], normalizer);
+
+                T coef = output[i];
+                if (coef.CompareTo(default(T)) != 0 )
+                {
+                    for (int j = 1; j < divisor.Count(); j++)
+                        output[i + j] = OP.Add(output[i+j], OP.Neg(OP.Mul(divisor[j], coef)));
+                }
+            }
+
+            int separator = output.Count() - (divisor.Count() - 1);
+            output.Reverse();
+            return (
+                output.GetRange(output.Count() - separator, separator),
+                output.GetRange(0, output.Count() - separator)
+            );
+        }
+
+        public static (Polynomial<T,C>, Polynomial<T,C>) operator /(Polynomial<T,C> lhs, Polynomial<T,C> rhs)
+        {
+            (List<T> quotient, List<T> remainder) = SyntheticDivision(lhs._coes, rhs._coes);
+
+            var q = new Polynomial<T, C>(quotient);
+            var r = new Polynomial<T, C>(remainder);
+
+            return (q, r);
         }
 
         public static Polynomial<T,C> operator +(Polynomial<T,C> lhs, T rhs)
         {
             Polynomial<T,C> polynomial = (lhs.Clone() as Polynomial<T,C>);
 
-            polynomial[0] = _calculator.Add(lhs[0], rhs);
+            polynomial[0] = OP.Add(lhs[0], rhs);
 
             return polynomial;
         }
@@ -180,7 +215,7 @@ namespace Algebra
 
         public static Polynomial<T,C> operator *(Polynomial<T,C> lhs, T rhs)
         {
-            List<T> multipliedCoes = lhs._coes.Select(i => _calculator.Mul(i, rhs)).ToList();
+            List<T> multipliedCoes = lhs._coes.Select(i => OP.Mul(i, rhs)).ToList();
 
             return new Polynomial<T,C>(multipliedCoes);
         }
@@ -194,7 +229,7 @@ namespace Algebra
         {
             Polynomial<T,C> polynomial = (lhs.Clone() as Polynomial<T,C>);
 
-            polynomial[0] = _calculator.Sub(lhs[0], rhs);
+            polynomial[0] = OP.Sub(lhs[0], rhs);
 
             return polynomial;
         }
@@ -203,7 +238,7 @@ namespace Algebra
         {
             Polynomial<T, C> polynomial = (rhs.Clone() as Polynomial<T, C>);
 
-            polynomial[0] = _calculator.Sub(lhs, rhs[0]);
+            polynomial[0] = OP.Sub(lhs, rhs[0]);
 
             return polynomial;
         }
@@ -213,7 +248,7 @@ namespace Algebra
             if (rhs.CompareTo(default(T)) == 0) throw new DivideByZeroException();
 
             Polynomial<T,C> polynomial = ((lhs.Clone() as Polynomial<T,C>));
-            polynomial._coes = lhs._coes.Select(i => _calculator.Div(i, rhs)).ToList();
+            polynomial._coes = lhs._coes.Select(i => OP.Div(i, rhs)).ToList();
 
             return polynomial;
         }
@@ -223,9 +258,44 @@ namespace Algebra
 
             Polynomial<T, C> polynomial = ((rhs.Clone() as Polynomial<T, C>));
 
-            polynomial._coes = rhs._coes.Select( i => (i.CompareTo(default(T)) == 0) ? i : _calculator.Div(lhs, i)).ToList();
+            polynomial._coes = rhs._coes.Select( i => (i.CompareTo(default(T)) == 0) ? i : OP.Div(lhs, i)).ToList();
 
             return polynomial;
+        }
+
+        private static int Sign(double x)
+        {
+            return x < 0.0 ? -1 : x > 0.0 ? 1 : 0;
+        }
+
+        public void PrintRoots(double lowerBound, double upperBound, double step)
+        {
+            double x = lowerBound, 
+                   ox = x;
+            double y = (double)(object) Calculate((T)(object) x),
+                   oy = y;
+            int s = Sign(y), 
+                os = s;
+
+            for (; x <= upperBound; x += step)
+            {
+                s = Sign(y = (double)(object)Calculate((T)(object)x));
+                if (s == 0)
+                {
+                    Console.WriteLine(x);
+                }
+                else if (s != os)
+                {
+                    var dx = x - ox;
+                    var dy = y - oy;
+                    var cx = x - dx * (y / dy);
+                    Console.WriteLine("~{0}", cx);
+                }
+
+                ox = x;
+                oy = y;
+                os = s;
+            }
         }
     }
 }

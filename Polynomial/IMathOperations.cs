@@ -13,5 +13,7 @@ namespace Algebra
         T Mul(T a, T b);
         T Div(T a, T b);
         T Pow(T x, double y);
+        T Neg(T x);
+        T Abs(T x);
     }
 }

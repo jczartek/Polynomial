@@ -133,5 +133,26 @@ namespace TestPolynomial
             result = poly2 * poly1;
             Assert.AreEqual(result.CompareTo(poly), 0);
         }
+
+        [TestMethod]
+        public void TestDivisionOperator()
+        {
+            var poly1 = new Polynomial<double, DoubleMathOperations>(new double[4] { -42, 0, -12, 1});
+            var poly2 = new Polynomial<double, DoubleMathOperations>(new double[2] { -3, 1 });
+
+            var (p, m) = poly1 / poly2;
+
+            var expectedResultPoly = new Polynomial<double, DoubleMathOperations>(new double[3] { -27, -9, 1 });
+            var expectedModuloPoly = new Polynomial<double, DoubleMathOperations>(new double[1] { -123 });
+
+            Assert.AreEqual(0, p.CompareTo(expectedResultPoly));
+            Assert.AreEqual(0, m.CompareTo(expectedModuloPoly));
+
+            var result = poly2  * expectedResultPoly + expectedModuloPoly;
+            Assert.AreEqual(0, poly1.CompareTo(result));
+
+            result = poly2 * p + m;
+            Assert.AreEqual(0, poly1.CompareTo(result));
+        }
     }
 }

@@ -15,5 +15,9 @@ namespace Algebra
 
         public double Pow(double x, double y) => Math.Pow(x, y);
 
+        public double Neg(double x) => -x;
+
+        public double Abs(double x) => Math.Abs(x);
+
     }
 }
