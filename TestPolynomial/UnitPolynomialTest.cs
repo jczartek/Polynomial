@@ -9,13 +9,20 @@ namespace TestPolynomial
         [TestMethod]
         public void TestToString()
         {
-            Polynomial<double, DoubleMathOperations> polynomial = new Polynomial<double, DoubleMathOperations>(new double[3] { 1, 2, 3 });
+            Polynomial<double, DoubleMathOperations> polynomial = new Polynomial<double, DoubleMathOperations>(new double[3] { 1, 2, -3 });
 
-            Assert.AreEqual("y = 1 + 2x + 3x^2", polynomial.ToString());
+            Assert.AreEqual("y = 1 + 2x - 3x^2", polynomial.ToString());
 
             polynomial[1] = 0;
 
-            Assert.AreEqual("y = 1 + 3x^2", polynomial.ToString());
+            Assert.AreEqual("y = 1 - 3x^2", polynomial.ToString());
+
+            polynomial = new Polynomial<double, DoubleMathOperations>(new double[3] { -1, -2, -3 });
+            Assert.AreEqual("y = -1 - 2x - 3x^2", polynomial.ToString());
+
+            polynomial = new Polynomial<double, DoubleMathOperations>(new double[3] { 1, 2, 3 });
+            Assert.AreEqual("y = 1 + 2x + 3x^2", polynomial.ToString());
+
         }
         [TestMethod]
         public void TestCompareTo()

@@ -52,13 +52,12 @@ namespace Algebra
             {
                 if (_coes[i].CompareTo(default(T)) == 0) continue;
                 
-                string sign = (_coes[i].CompareTo(default(T))) == -1 ? " - " : " + ";
+                string sign = ((_coes[i].CompareTo(default(T))) == -1) ? " - " : " + ";
                 T absNumber = OP.Abs(_coes[i]);
-                
-                builder.AppendFormat("{0}{1}{2}",
-                    i > 0 ? absNumber.ToString() + "x" : _coes[i].ToString(),
-                    i > 1 ? "^" + (i) : "",
-                    i < (_coes.Count - 1) ? sign : "");
+
+                builder.AppendFormat("{0}{1}",
+                    i > 0 ? sign + absNumber.ToString() + "x" : _coes[i].ToString(),
+                    i > 1 ? "^" + (i) : "");
             }
 
             return builder.ToString();
